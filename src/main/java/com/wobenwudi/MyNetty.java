@@ -1,10 +1,16 @@
 package com.wobenwudi;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.ServerSocketChannel;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.junit.Test;
@@ -98,4 +104,56 @@ public class MyNetty {
         future.sync().channel().closeFuture().sync();
         System.out.println("Server close ...");
     }
+
+    @Test
+    public void nettyClient() throws InterruptedException {
+        NioEventLoopGroup group = new NioEventLoopGroup(1);
+
+        Bootstrap bootstrap = new Bootstrap();
+        ChannelFuture connect = bootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new MyInHandler());
+                    }
+                })
+                .connect(
+                        new InetSocketAddress("192.168.1.227", 9090)
+                );
+
+        Channel client = connect.sync().channel();
+
+        ByteBuf byteBuf = Unpooled.copiedBuffer("Hello Server".getBytes());
+        ChannelFuture send = client.writeAndFlush(byteBuf);
+        send.sync();
+        client.closeFuture().sync();
+
+
+    }
+
+
+    @Test
+    public void nettyServer() throws InterruptedException {
+        NioEventLoopGroup group = new NioEventLoopGroup(1);
+        ServerBootstrap bs = new ServerBootstrap();
+        ChannelFuture bind = bs.group(group, group)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new MyInHandler());
+                    }
+                })
+                .bind(new InetSocketAddress("192.168.1.44", 9090));
+
+        bind.sync().channel().closeFuture().sync();
+
+
+    }
+
+
+
 }
