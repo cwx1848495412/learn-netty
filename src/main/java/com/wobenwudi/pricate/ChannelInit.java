@@ -1,4 +1,4 @@
-package com.wobenwudi;
+package com.wobenwudi.pricate;
 
 import io.netty.channel.*;
 
