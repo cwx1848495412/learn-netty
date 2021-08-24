@@ -1,5 +1,5 @@
 package com.wobenwudi.rpc;
 
 public interface Car {
-    void move(String msg);
+    String move(String msg);
 }

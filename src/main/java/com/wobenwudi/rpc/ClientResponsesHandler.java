@@ -13,37 +13,8 @@ public class ClientResponsesHandler extends ChannelInboundHandlerAdapter {
     // consumer
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf) msg;
-
-        int large = Constant.LARGE;
-        // 读协议头
-        if (buf.readableBytes() >= large) {
-            byte[] bytes = new byte[large];
-            buf.readBytes(bytes);
-
-            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-            ObjectInputStream oin = new ObjectInputStream(in);
-            MyHeader header = (MyHeader) oin.readObject();
-
-            System.out.println("client response header ID: "+header.getRequestID());
-            // TODO:: 粘包拆包 找ID
-            ResponseHandler.runCallback(header.getRequestID());
-
-//            if (buf.readableBytes() >= header.getDataLen()) {
-//
-//                byte[] data = new byte[(int) header.getDataLen()];
-//                buf.readBytes(data);
-//
-//                ByteArrayInputStream din = new ByteArrayInputStream(bytes);
-//                ObjectInputStream doin = new ObjectInputStream(in);
-//                MyContent content = (MyContent) doin.readObject();
-//
-//                System.out.println(content.getName());
-//
-//            }
-
-
-        }
-
+        PackageMsg packageMsg = (PackageMsg) msg;
+        // 曾经没考虑返回
+        ResponseHandler.runCallback(packageMsg);
     }
 }

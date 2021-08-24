@@ -33,7 +33,7 @@ public class ServerDecode extends ByteToMessageDecoder {
 //            System.out.println("server response header ID: " + header.getRequestID());
 
             if (buf.readableBytes() >= header.getDataLen()) {
-                // 上满get 没有移动指针
+                // 上面get 没有移动指针
                 // 需要先移动到body的区域
                 buf.readBytes(large);
 
@@ -42,10 +42,19 @@ public class ServerDecode extends ByteToMessageDecoder {
 
                 ByteArrayInputStream din = new ByteArrayInputStream(data);
                 ObjectInputStream doin = new ObjectInputStream(din);
-                MyContent content = (MyContent) doin.readObject();
 
-//                System.out.println(content.getName());
-                out.add(new PackageMsg(header,content));
+
+                if (header.getFlag() == Constant.FLAG_CLIENT) {
+                    // 客户端发起请求
+                    MyContent content = (MyContent) doin.readObject();
+                    out.add(new PackageMsg(header, content));
+                }
+
+                if (header.getFlag() == Constant.FLAG_SERVER) {
+                    // 服务端返回响应
+                    MyContent content = (MyContent) doin.readObject();
+                    out.add(new PackageMsg(header, content));
+                }
 
             } else {
                 break;

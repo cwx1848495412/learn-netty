@@ -45,7 +45,7 @@ public class ServerRequestHandler extends ChannelInboundHandlerAdapter {
                     execThreadName,
                     packageMsg.getContent().getArgs()[0]
             );
-            System.out.println(format);
+
             content.setResult(format);
 
             byte[] contentByte = Constant.ser(content);

@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,7 +50,9 @@ public class MyRPCTest {
             threads[i] = new Thread(() -> {
                 // 动态代理获取对象
                 Car car = proxyGet(Car.class);
-                car.move("hello " + num.incrementAndGet());
+                String param = "hello " + num.incrementAndGet();
+                String moveRes = car.move(param);
+                System.out.println("client over msg: " + moveRes + "param: " + param);
             });
         }
 
@@ -130,12 +133,9 @@ public class MyRPCTest {
                 NioSocketChannel clientChannel = factory.getClient(new InetSocketAddress("localhost", 9090));
 
                 // 4. 发送-->走IO Netty 驱动里的回调
-                CountDownLatch countDownLatch = new CountDownLatch(1);
 
-                ResponseHandler.addCallback(header.getRequestID(), () -> {
-                    countDownLatch.countDown();
-                });
-
+                CompletableFuture<String> future = new CompletableFuture<>();
+                ResponseHandler.addCallback(header.getRequestID(), future);
 
                 ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT
                         .directBuffer(msgHeader.length + msgBody.length);
@@ -149,12 +149,11 @@ public class MyRPCTest {
                 // 发送成功了 其实客户端并没有返回值
 
                 // 死等 等待其他线程通过requestID  唤醒
-                countDownLatch.await();
 
 
                 // 5. 需要实现阻塞 线程睡眠 等待返回
                 // 6. countdownLatch
-                return null;
+                return future.get();
             }
         });
     }
