@@ -15,44 +15,17 @@ public class ServerRequestHandler extends ChannelInboundHandlerAdapter {
     // provider
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf) msg;
-        ByteBuf sendBuf = buf.copy();
-        System.out.println("channel start: " + buf.readableBytes());
-
-        int large = Constant.LARGE;
-
-        // 读协议头
-        if (buf.readableBytes() >= large) {
-            byte[] bytes = new byte[large];
-            buf.readBytes(bytes);
-
-            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-            ObjectInputStream oin = new ObjectInputStream(in);
-            MyHeader header = (MyHeader) oin.readObject();
-
-            System.out.println("server response header ID: " + header.getRequestID());
-
-            if (buf.readableBytes() >= header.getDataLen()) {
-
-                byte[] data = new byte[(int) header.getDataLen()];
-                buf.readBytes(data);
-
-                ByteArrayInputStream din = new ByteArrayInputStream(data);
-                ObjectInputStream doin = new ObjectInputStream(din);
-                MyContent content = (MyContent) doin.readObject();
-
-                System.out.println(content.getName());
-
-            } else {
-                System.out.println("channel else: " + buf.readableBytes());
-            }
+        PackageMsg packageMsg = (PackageMsg) msg;
+        System.out.println("server handler : " +
+                packageMsg.getContent().getMethodName() +
+                packageMsg.getContent().getArgs()[0]
+        );
+        // TODO:: dispatcher 分发请求给不同路由对应方法
+        // 假设处理了用户请求 要给客户端返回了~
+        ctx.writeAndFlush("".getBytes());
 
 
-        }
 
-
-        ChannelFuture channelFuture = ctx.writeAndFlush(sendBuf);
-        channelFuture.sync();
     }
 
 }

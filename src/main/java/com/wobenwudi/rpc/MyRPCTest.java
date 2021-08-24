@@ -20,6 +20,7 @@ import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 来回通信
@@ -41,13 +42,14 @@ public class MyRPCTest {
 
         System.out.println("server started....");
 
+        AtomicInteger num = new AtomicInteger(0);
         int size = 20;
         Thread[] threads = new Thread[size];
         for (int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(() -> {
                 // 动态代理获取对象
                 Car car = proxyGet(Car.class);
-                car.move("hello");
+                car.move("hello " + num.incrementAndGet());
             });
         }
 
@@ -71,6 +73,7 @@ public class MyRPCTest {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         System.out.println("server accept client port: " + ch.remoteAddress().getPort());
                         ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new ServerDecode());
                         pipeline.addLast(new ServerRequestHandler());
                     }
                 })
