@@ -65,7 +65,7 @@ public class MyRPCTest {
 
     @Test
     public void startServer() {
-        NioEventLoopGroup boss = new NioEventLoopGroup(20);
+        NioEventLoopGroup boss = new NioEventLoopGroup(1);
         NioEventLoopGroup worker = boss;
 
         ServerBootstrap sbs = new ServerBootstrap();
