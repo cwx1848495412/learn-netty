@@ -32,11 +32,12 @@ public class ServerDecode extends ByteToMessageDecoder {
 
 //            System.out.println("server response header ID: " + header.getRequestID());
 
-            if (buf.readableBytes() >= header.getDataLen()) {
+            // 还要大于加上头的大小 才行
+            // 不大于 都算到下次解码中去
+            if (buf.readableBytes() >= header.getDataLen() + large) {
                 // 上面get 没有移动指针
                 // 需要先移动到body的区域
                 buf.readBytes(large);
-
                 byte[] data = new byte[(int) header.getDataLen()];
                 buf.readBytes(data);
 
