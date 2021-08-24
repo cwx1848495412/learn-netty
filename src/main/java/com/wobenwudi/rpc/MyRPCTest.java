@@ -62,7 +62,7 @@ public class MyRPCTest {
 
     @Test
     public void startServer() {
-        NioEventLoopGroup boss = new NioEventLoopGroup(1);
+        NioEventLoopGroup boss = new NioEventLoopGroup(20);
         NioEventLoopGroup worker = boss;
 
         ServerBootstrap sbs = new ServerBootstrap();
@@ -165,7 +165,7 @@ public class MyRPCTest {
         long requestID = Math.abs(UUID.randomUUID().getLeastSignificantBits());
 
         // 标志位
-        header.setFlag(Constant.FLAG_ONE);
+        header.setFlag(Constant.FLAG_CLIENT);
         header.setDataLen(msgBody.length);
         header.setRequestID(requestID);
 

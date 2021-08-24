@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientFactory {
 
-    private int poolSize = 1;
+    private int poolSize = 10;
     private Random random = new Random();
     private NioEventLoopGroup clientWorker;
 

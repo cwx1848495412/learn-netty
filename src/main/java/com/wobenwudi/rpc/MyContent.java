@@ -9,6 +9,11 @@ public class MyContent implements Serializable {
     private Class<?>[] parameterTypes;
     private Object[] args;
 
+    /**
+     * 服务端的返回
+     */
+    private String result;
+
     public String getName() {
         return name;
     }
@@ -41,4 +46,11 @@ public class MyContent implements Serializable {
         this.args = args;
     }
 
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
 }
