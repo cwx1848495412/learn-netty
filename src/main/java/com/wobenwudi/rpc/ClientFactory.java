@@ -23,7 +23,7 @@ public class ClientFactory {
     private Random random = new Random();
     private NioEventLoopGroup clientWorker;
 
-    private ConcurrentHashMap<InetSocketAddress, ClientPool> outBoxs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<InetSocketAddress, ClientPool> outBoxs = new ConcurrentHashMap<>();
 
 
     private static final ClientFactory factory;

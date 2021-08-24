@@ -17,6 +17,7 @@ public class ServerRequestHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         ByteBuf sendBuf = buf.copy();
+        System.out.println("channel start: " + buf.readableBytes());
 
         int large = Constant.LARGE;
 
@@ -42,6 +43,8 @@ public class ServerRequestHandler extends ChannelInboundHandlerAdapter {
 
                 System.out.println(content.getName());
 
+            } else {
+                System.out.println("channel else: " + buf.readableBytes());
             }
 
 
